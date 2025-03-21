@@ -11,11 +11,11 @@
 #include <vector>
 using namespace std;
 
-#define bDEBUG true 
+#define bDEBUG false 
 
 //for drawing
-map<int, int> wform_factor = {{31, 1000}, {41, 500}, {42, 500}};
-map<int, int> cutPed = {{1, 5}, {2, 5}, {31, 5}, {41, 50}, {42, 50}};
+map<int, int> wform_factor = {{31, 100}, {41, 400}, {42, 400}};
+map<int, int> cutPed = {{1, 50}, {2, 50}, {31, 50}, {41, 5}, {42, 5}};
 
 const float xCVS = 1.0; //Adjust canvas size
 
@@ -33,7 +33,7 @@ void quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "./2
 	gStyle->SetOptStat(0);
 	gStyle->SetTitleSize(0.04);
 
-	vector<int> mid = {42};
+	vector<int> mid = {1, 2, 31, 41, 42};
 
 	if ( bDEBUG ){
 		ctmp = new TCanvas("ctmp", "ctmp", 600, 500);
@@ -258,7 +258,11 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 		gPad->SetMargin(0.14,0.02,0.1,0.01);
 		gPad->SetTicks();
 		TH1F* H1Temp = new TH1F(Form("RUN %d, MID %d, CH%d", RunNo, mid, a+1), "", 2500, 0, 2500);
-		H1Temp->GetXaxis()->SetRangeUser(0, nADC);
+		if ( mid==1 ){
+			H1Temp->GetXaxis()->SetRangeUser(0, nADC);
+		}else{
+			H1Temp->GetXaxis()->SetRangeUser(0, nADC);
+		}
 		H1Temp->GetYaxis()->SetRangeUser(-100, 5500);
 		//H1Temp->GetXaxis()->SetTitle("Time bin");
 		H1Temp->GetXaxis()->SetTitleSize(0.05*1.6);
@@ -338,7 +342,18 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 
 				UInt_t tModuleID = dataChop[j][15] & 0xFF;
 				UInt_t tChannel  = dataChop[j][16] & 0xFF;
-				if (tChannel<1 || tChannel>4) cout <<Form("WARNING: irregular ch ID found: %i\n", tChannel);
+				if (tChannel<1 || tChannel>4){
+					cout <<Form("WARNING: irregular ch ID found: %i\n", tChannel);
+					nPacketProcessed++;
+					continue;
+				}
+
+				/*
+				if (tTrigType!=1){
+					nPacketProcessed++;
+					continue;
+				}
+				*/
 
 				ULong_t tLocTNum = 0;
 				for (int a=0; a<4; a++) tLocTNum += ( (ULong_t)(dataChop[j][17+a] & 0xFF) << 8*a );
@@ -360,8 +375,10 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 
 				if ( bDEBUG ){
 					cout <<Form("%i %i %i %i | %4li %4i | %i %5li %5li %i | %lli %lli \n",
-							mid,tModuleID,j+1,tChannel, tDataLen,tPed,
-							tTrigType,tTrigNum,tLocTNum,tLocTPat, tTrigTime,tDatTime);
+							mid,tModuleID,j+1,tChannel, 
+							tDataLen,tPed,
+							tTrigType,tTrigNum,tLocTNum,tLocTPat, 
+							tTrigTime,tDatTime);
 				}
 
 				if ( nPacketProcessed<H1Packet->GetNbinsX() ){
@@ -378,6 +395,8 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 				}
 
 				H2->Fill(tTrigNum, tTrigTime);
+
+#if 1
 
 				/*
 				++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -443,6 +462,7 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 					c1->cd(nCh*(mid-1)+tChannel);
 					H1_pulse->DrawCopy("same");
 				}
+#endif
 
 				nPacketProcessed++;
 				if (nPacketProcessed%10000 == 0) cout << "Processed eventNum = " << nPacketProcessed/(nCh) << endl;
@@ -601,8 +621,13 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		gPad->SetTicks();
 		gPad->SetMargin(0.14,0.02,0.1,0.01);
 		TH1F* H1Temp = new TH1F(Form("RUN %d, MID %d, CH%d", RunNo, mid, a+1), "", 2500, 0, 2500);
-		H1Temp->GetXaxis()->SetRangeUser(0, 124);
-		H1Temp->GetYaxis()->SetRangeUser(-10*wform_factor[mid], 5*wform_factor[mid]);
+		if ( mid==31 ){
+			H1Temp->GetYaxis()->SetRangeUser(-1*wform_factor[mid], 5*wform_factor[mid]);
+			H1Temp->GetXaxis()->SetRangeUser(0, 124);
+		}else{
+			H1Temp->GetYaxis()->SetRangeUser(-1*wform_factor[mid], 5*wform_factor[mid]);
+			H1Temp->GetXaxis()->SetRangeUser(0, 124);
+		}
 		//H1Temp->GetXaxis()->SetTitle("Time bin");
 		H1Temp->GetXaxis()->SetTitleSize(0.05*1.6);
 		H1Temp->GetXaxis()->SetLabelSize(0.045*1.6);
@@ -695,15 +720,15 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 				<< " " << tcb_trigger_time 
 				//<< " " << local_trigger_number 
 				//<< " " << local_gate_coarse_time 
-				<< " "  << channel 
-				<< " " << data_length 
+				<< ", channel "  << channel 
+				<< ", data length " << data_length 
 				<< endl;
 		}
 
 		if ( fabs(tcb_trigger_number-trigN)>10000 ){
 			cout << "WARNNING! suspicious tcb trigger number! MID: " << mid <<", TCB TrigN: " << tcb_trigger_number << " " << trigN 
 				<< ", CH: " << channel << endl;
-			fread(data, 1, 512 - 32, fp);
+			fread(data, 1, 256*2 - 32, fp);
 			nPacketProcessed++;
 			continue;
 		}
@@ -712,11 +737,11 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 			H1Packet->SetBinContent(nPacketProcessed+1, 100*tcb_trigger_number + channel); 
 		}
 
-		if ( !(data_length==256 || data_length==512) ){
+		if ( !(data_length==256 || data_length==256*2) ){
 			if ( channel==0 ){
 				fread(data, 1, 256 - 32, fp);
 			}else{
-				fread(data, 1, 512 - 32, fp);
+				fread(data, 1, 256*2 - 32, fp);
 			}
 			cout << "WARNNING! suspicious data length! MID: " << mid << ", DLength: " << data_length << ", CH: " << channel << endl;
 			nPacketProcessed++;
