@@ -13,11 +13,14 @@ using namespace std;
 
 #define bDEBUG false 
 
+
+
 //for drawing
-map<int, int> wform_factor = {{31, 100}, {41, 400}, {42, 400}};
-map<int, int> cutPed = {{1, 50}, {2, 50}, {31, 50}, {41, 5}, {42, 5}};
+map<int, int> wform_factor = {{31, 100}, {41, 3000}, {42, 3000}};
+map<int, int> cutPed = {{1, 50}, {2, 50}, {31, 20}, {41, 20}, {42, 20}};
 
 const float xCVS = 1.0; //Adjust canvas size
+const int nPacketCheck = 1000000;
 
 TCanvas *ctmp;
 TCanvas *c1;
@@ -33,7 +36,7 @@ void quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "./2
 	gStyle->SetOptStat(0);
 	gStyle->SetTitleSize(0.04);
 
-	vector<int> mid = {1, 2, 31, 41, 42};
+	vector<int> mid = {41, 42};
 
 	if ( bDEBUG ){
 		ctmp = new TCanvas("ctmp", "ctmp", 600, 500);
@@ -100,7 +103,7 @@ int GetDataLength(const char* inFile)
 	return (int)dataLength;
 }//GetDataLength
 
-map<int, int> GetChMap(void)
+map<int, int> GetHodoChMap(void)
 {
     std::map<int, int> chMap;
 
@@ -141,6 +144,86 @@ map<int, int> GetChMap(void)
     return chMap;
 }//map
 
+map<int, int> GetCaloChMap(void)
+{
+
+	std::map<int, int> chMap;
+
+	chMap.insert( std::pair<int, int> (4101, 1001) );
+	chMap.insert( std::pair<int, int> (4102, 1001) );
+	chMap.insert( std::pair<int, int> (4103, 1001) );
+	chMap.insert( std::pair<int, int> (4104, 1001) );
+	chMap.insert( std::pair<int, int> (4105, 1001) );
+	chMap.insert( std::pair<int, int> (4106, 1001) );
+	chMap.insert( std::pair<int, int> (4107, 1001) );
+	chMap.insert( std::pair<int, int> (4108, 1001) );
+	chMap.insert( std::pair<int, int> (4109, 1001) );
+	chMap.insert( std::pair<int, int> (4110, 1001) );
+	chMap.insert( std::pair<int, int> (4111, 1001) );
+	chMap.insert( std::pair<int, int> (4112, 1001) );
+	chMap.insert( std::pair<int, int> (4113, 1001) );
+	chMap.insert( std::pair<int, int> (4114, 1001) );
+	chMap.insert( std::pair<int, int> (4115, 1001) );
+	chMap.insert( std::pair<int, int> (4116, 1001) );
+	chMap.insert( std::pair<int, int> (4117, 1001) );
+	chMap.insert( std::pair<int, int> (4118, 1001) );
+	chMap.insert( std::pair<int, int> (4119, 1001) );
+	chMap.insert( std::pair<int, int> (4120, 1001) );
+	chMap.insert( std::pair<int, int> (4121, 1001) );
+	chMap.insert( std::pair<int, int> (4122, 1001) );
+	chMap.insert( std::pair<int, int> (4123, 1001) );
+	chMap.insert( std::pair<int, int> , 1001) );
+	chMap.insert( std::pair<int, int> (412501) );
+	chMap.insert( std::pair<int, int> (4126, 1001) );
+	chMap.insert( std::pair<int, int> (4127, 1001) );
+	chMap.insert( std::pair<int, int> (4128, 1001) );
+	chMap.insert( std::pair<int, int> (4129, 1001) );
+	chMap.insert( std::pair<int, int> (4130, 1001) );
+	chMap.insert( std::pair<int, int> (4131, 1001) );
+	chMap.insert( std::pair<int, int> (4132, 1001) );
+
+	chMap.insert( std::pair<int, int> (4201, 2012) );
+	chMap.insert( std::pair<int, int> (4202, 2024) );
+	chMap.insert( std::pair<int, int> (4203, 2009) );
+	chMap.insert( std::pair<int, int> (4204, 2008) );
+	chMap.insert( std::pair<int, int> (4205, 2010) );
+	chMap.insert( std::pair<int, int> (4206, 2021) );
+	chMap.insert( std::pair<int, int> (4207, 2013) );
+	chMap.insert( std::pair<int, int> (4208, 2014) );
+	chMap.insert( std::pair<int, int> (4209, 2032) );
+	chMap.insert( std::pair<int, int> (4210, 2023) );
+	chMap.insert( std::pair<int, int> (4211, 2025) );
+	chMap.insert( std::pair<int, int> (4212, 2019) );
+	chMap.insert( std::pair<int, int> (4213, 2020) );
+	chMap.insert( std::pair<int, int> (4214, 2033) );
+	chMap.insert( std::pair<int, int> (4215, 20) );
+	chMap.insert( std::pair<int, int> (4216, 1001) );
+	chMap.insert( std::pair<int, int> (4217, 1001) );
+	chMap.insert( std::pair<int, int> (4218, 1001) );
+	chMap.insert( std::pair<int, int> (4219, 1001) );
+	chMap.insert( std::pair<int, int> (4220, 1001) );
+	chMap.insert( std::pair<int, int> (4221, 1001) );
+	chMap.insert( std::pair<int, int> (4222, 1001) );
+	chMap.insert( std::pair<int, int> (4223, 1001) );
+	chMap.insert( std::pair<int, int> (4224, 1001) );
+	chMap.insert( std::pair<int, int> (4225, 1001) );
+	chMap.insert( std::pair<int, int> (4226, 1001) );
+	chMap.insert( std::pair<int, int> (4227, 1001) );
+	chMap.insert( std::pair<int, int> (4228, 1001) );
+	chMap.insert( std::pair<int, int> (4229, 1001) );
+	chMap.insert( std::pair<int, int> (4230, 1001) );
+	chMap.insert( std::pair<int, int> (4231, 1001) );
+	chMap.insert( std::pair<int, int> (4232, 1001) );
+
+}
+
+/*
+map<str*, vector<int>> GetHodoChMap(void)
+{
+	std::map<int, int> chMap;
+
+*/
+
 //--------------------------------------------------------------------------------------------------------
 void astropix_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "data_hodoscope_raw", int mid = 42)
 {
@@ -150,18 +233,19 @@ void astropix_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* 
 	const int Len = 64; //kbytes
 	char data[Len];
 
-	const int nChip = 1;
+	const int nChip = 2;
 
 	TH1D *H1Packet[nChip];
 	for (int i=0; i<nChip; i++){
-		H1Packet[i] = new TH1D(Form("PacketQA_AstroPix_%d_%d",mid,i), "", 100000, 0, 100000);
+		H1Packet[i] = new TH1D(Form("PacketQA_AstroPix_%d_%d",mid,i), "", nPacketCheck, 0, nPacketCheck);
 	}//i
 
 	ifstream in;
 
-	for (int i=0; i<nChip; i++){
+	for (int i=1; i<nChip; i++){
 
-		const char* inFile = Form("%s/apix_%d_%d_%i.dat", inPath, i+1, mid, RunNo);
+		//const char* inFile = Form("%s/apix_%d_%d_%i.dat", inPath, i+1, mid, RunNo);
+		const char* inFile = Form("%s/Run_%d/Run_%d_MID_%d/apix_%d_%d_%i.dat", inPath, RunNo, RunNo, mid, i+1, mid, RunNo);
 
 		int BID = GetBoardNumber( inFile );
 
@@ -186,7 +270,7 @@ void astropix_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* 
 
 			unsigned long long tcb_trigger_time = (fFineTime * 8) + (fCoarseTime * 1000);
 
-			//cout << fBoardID << " " << fFineTime << " " << fCoarseTime << endl;
+			cout << fBoardID << " " << fFineTime << " " << fCoarseTime << endl;
 			H1Packet[i]->SetBinContent(nPacketProcessed+1, tcb_trigger_time);
 
 			nPacketProcessed++;
@@ -244,7 +328,7 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 	UInt_t  fADC[nCh][nADC]; //ADC
 	UInt_t  fTDC[nCh][nTDC]; //TDC
 
-	if ( 0 ){
+	if ( 1 ){
 		cout << "Total length: " << TLen << ", nADC: " << nADC << ", nTDC: " << nTDC << endl;
 	}
 
@@ -278,7 +362,7 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 	unsigned long long trigT = -1;
 	TH2F* H2 = new TH2F(Form("trig_nVSt_%d",mid), Form(";Trigger Number; Trigger Time"), 10000,0,10000, 200,0,0.5*1.E10);
 
-	TH1F *H1Packet = new TH1F(Form("PacketQA_%d",mid), "", 100000, 0, 100000);
+	TH1F *H1Packet = new TH1F(Form("PacketQA_%d",mid), "", nPacketCheck, 0, nPacketCheck);
 
 	ifstream in;
 	int nPacketProcessed=0;
@@ -484,7 +568,7 @@ void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* in
 		leg->SetBorderSize(0);
 		leg->SetTextFont(43);
 		leg->SetTextSize(8);
-		leg->AddEntry("",Form("MID %d, CH %d", mid, a),"h"); 
+		leg->AddEntry("",Form("MID %d, CH %d", mid, a+1),"h"); 
 		leg->AddEntry("",Form("Hit rate %d / %d = %1.2f",nHit[a],trigN,nHit[a]*1.0/trigN),"h");
 
 		H1_rate->SetBinContent(a+1, nHit[a]*1.0/trigN);
@@ -604,7 +688,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 	// Cuts, Containers
 	//----------------------------------------------------------
 	const int nCh = 32;
-	std::map<int, int> chMap = GetChMap();
+	std::map<int, int> chMap = GetHodoChMap();
 
 	int nHit[nCh] = {0};
 
@@ -643,7 +727,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 	TH2F* H2 = new TH2F(Form("trig_nVSt_%d",mid), Form("; Trigger Number; Trigger Time"), 10000,0,10000, 200,0,0.5*1.E10);
 	TH2F* H2Local = new TH2F(Form("localtrig_nVSt_%d",mid), Form("; Trigger Number; Trigger Time"), 10000,0,10000, 200,0,0.5*1.E10);
 
-	TH1F *H1Packet = new TH1F(Form("PacketQA_%d",mid), "", 100000, 0, 100000);
+	TH1F *H1Packet = new TH1F(Form("PacketQA_%d",mid), "", nPacketCheck, 0, nPacketCheck);
 
 	#if 1 
 	// Processing
@@ -704,6 +788,9 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 
 		if ( channel>nCh ){
 			cout << "WARNNING! suspicious channel number! MID: " << mid << ", CH:" << channel << endl; 
+			fread(data, 1, 128*4 - 32, fp);
+			nPacketProcessed++;
+			continue;
 		}
 
 		/*
@@ -728,7 +815,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		if ( fabs(tcb_trigger_number-trigN)>10000 ){
 			cout << "WARNNING! suspicious tcb trigger number! MID: " << mid <<", TCB TrigN: " << tcb_trigger_number << " " << trigN 
 				<< ", CH: " << channel << endl;
-			fread(data, 1, 256*2 - 32, fp);
+			fread(data, 1, 128*4 - 32, fp);
 			nPacketProcessed++;
 			continue;
 		}
@@ -737,11 +824,11 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 			H1Packet->SetBinContent(nPacketProcessed+1, 100*tcb_trigger_number + channel); 
 		}
 
-		if ( !(data_length==256 || data_length==256*2) ){
+		if ( !(data_length==256 || data_length==128*4) ){
 			if ( channel==0 ){
 				fread(data, 1, 256 - 32, fp);
 			}else{
-				fread(data, 1, 256*2 - 32, fp);
+				fread(data, 1, 128*4 - 32, fp);
 			}
 			cout << "WARNNING! suspicious data length! MID: " << mid << ", DLength: " << data_length << ", CH: " << channel << endl;
 			nPacketProcessed++;
@@ -857,7 +944,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		leg->SetBorderSize(0);
 		leg->SetTextFont(43);
 		leg->SetTextSize(8);
-		leg->AddEntry("",Form("MID %d, CH %d", mid, a),"h"); 
+		leg->AddEntry("",Form("MID %d, CH %d", mid, a+1),"h"); 
 		leg->AddEntry("",Form("Hit rate %d / %d = %1.2f",nHit[a],trigN,nHit[a]*1.0/trigN),"h");
 
 		H1_rate->SetBinContent(a+1, nHit[a]*1.0/trigN);
