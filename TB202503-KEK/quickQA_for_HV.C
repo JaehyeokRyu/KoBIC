@@ -277,6 +277,8 @@ void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath
 	for (int ii=0; ii<2; ii++){
 		for (int ich=0; ich<32; ich++){
 
+			if ( ii==0 && (ich<4) ) continue;
+
 			int val = chMapCalo[(41+ii)*100 + ich + 1];
 			int modid = val%100;
 
