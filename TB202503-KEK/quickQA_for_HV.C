@@ -314,6 +314,14 @@ void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath
 		}//ich
 	}//ii
 
+	TFile *outfile = new TFile(Form("outfile_Run%d.root", RunNo), "recreate");
+	for (int ii=0; ii<2; ii++){
+		for (int ich=0; ich<32; ich++){
+			H1_sum[ii][ich]->Write();
+		}
+	}
+	outfile->Close();
+
 	return;
 }
 
@@ -786,6 +794,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		leg->AddEntry("",Form("RUN %d, MID %d", RunNo, mid),"h"); 
 		leg->Draw();
 	}
+
 
 
 }
