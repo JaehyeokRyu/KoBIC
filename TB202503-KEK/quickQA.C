@@ -150,77 +150,100 @@ map<int, int> GetCaloChMap(void)
 	std::map<int, int> chMap;
 
 	chMap.insert( std::pair<int, int> (4101, 1001) );
-	chMap.insert( std::pair<int, int> (4102, 1001) );
-	chMap.insert( std::pair<int, int> (4103, 1001) );
-	chMap.insert( std::pair<int, int> (4104, 1001) );
-	chMap.insert( std::pair<int, int> (4105, 1001) );
-	chMap.insert( std::pair<int, int> (4106, 1001) );
-	chMap.insert( std::pair<int, int> (4107, 1001) );
-	chMap.insert( std::pair<int, int> (4108, 1001) );
-	chMap.insert( std::pair<int, int> (4109, 1001) );
-	chMap.insert( std::pair<int, int> (4110, 1001) );
-	chMap.insert( std::pair<int, int> (4111, 1001) );
-	chMap.insert( std::pair<int, int> (4112, 1001) );
-	chMap.insert( std::pair<int, int> (4113, 1001) );
-	chMap.insert( std::pair<int, int> (4114, 1001) );
-	chMap.insert( std::pair<int, int> (4115, 1001) );
-	chMap.insert( std::pair<int, int> (4116, 1001) );
-	chMap.insert( std::pair<int, int> (4117, 1001) );
-	chMap.insert( std::pair<int, int> (4118, 1001) );
-	chMap.insert( std::pair<int, int> (4119, 1001) );
-	chMap.insert( std::pair<int, int> (4120, 1001) );
-	chMap.insert( std::pair<int, int> (4121, 1001) );
-	chMap.insert( std::pair<int, int> (4122, 1001) );
-	chMap.insert( std::pair<int, int> (4123, 1001) );
-	chMap.insert( std::pair<int, int> , 1001) );
-	chMap.insert( std::pair<int, int> (412501) );
-	chMap.insert( std::pair<int, int> (4126, 1001) );
-	chMap.insert( std::pair<int, int> (4127, 1001) );
-	chMap.insert( std::pair<int, int> (4128, 1001) );
-	chMap.insert( std::pair<int, int> (4129, 1001) );
-	chMap.insert( std::pair<int, int> (4130, 1001) );
-	chMap.insert( std::pair<int, int> (4131, 1001) );
-	chMap.insert( std::pair<int, int> (4132, 1001) );
+	chMap.insert( std::pair<int, int> (4102, 2001) );
+	chMap.insert( std::pair<int, int> (4103, 1006) );
+	chMap.insert( std::pair<int, int> (4104, 2006) );
+	chMap.insert( std::pair<int, int> (4105, 2005) );
+	chMap.insert( std::pair<int, int> (4106, 2026) );
+	chMap.insert( std::pair<int, int> (4107, 2030) );
+	chMap.insert( std::pair<int, int> (4108, 2029) );
+	chMap.insert( std::pair<int, int> (4109, 2003) );
+	chMap.insert( std::pair<int, int> (4110, 2018) );
+	chMap.insert( std::pair<int, int> (4111, 2017) );
+	chMap.insert( std::pair<int, int> (4112, 2031) );
+	chMap.insert( std::pair<int, int> (4113, 2002) );
+	chMap.insert( std::pair<int, int> (4114, 2027) );
+	chMap.insert( std::pair<int, int> (4115, 2022) );
+	chMap.insert( std::pair<int, int> (4116, 2028) );
+	chMap.insert( std::pair<int, int> (4117, 1007) );
+	chMap.insert( std::pair<int, int> (4118, 2007) );
+	chMap.insert( std::pair<int, int> (4119, 1015) );
+	chMap.insert( std::pair<int, int> (4120, 2015) );
+	chMap.insert( std::pair<int, int> (4121, 1005) );
+	chMap.insert( std::pair<int, int> (4122, 1026) );
+	chMap.insert( std::pair<int, int> (4123, 1030) );
+	chMap.insert( std::pair<int, int> (4124, 1029) );
+	chMap.insert( std::pair<int, int> (4125, 1003) );
+	chMap.insert( std::pair<int, int> (4126, 1018) );
+	chMap.insert( std::pair<int, int> (4127, 1017) );
+	chMap.insert( std::pair<int, int> (4128, 1031) );
+	chMap.insert( std::pair<int, int> (4129, 1002) );
+	chMap.insert( std::pair<int, int> (4130, 1027) );
+	chMap.insert( std::pair<int, int> (4131, 1022) );
+	chMap.insert( std::pair<int, int> (4132, 1028) );
 
-	chMap.insert( std::pair<int, int> (4201, 2012) );
-	chMap.insert( std::pair<int, int> (4202, 2024) );
-	chMap.insert( std::pair<int, int> (4203, 2009) );
-	chMap.insert( std::pair<int, int> (4204, 2008) );
-	chMap.insert( std::pair<int, int> (4205, 2010) );
-	chMap.insert( std::pair<int, int> (4206, 2021) );
-	chMap.insert( std::pair<int, int> (4207, 2013) );
-	chMap.insert( std::pair<int, int> (4208, 2014) );
-	chMap.insert( std::pair<int, int> (4209, 2032) );
-	chMap.insert( std::pair<int, int> (4210, 2023) );
-	chMap.insert( std::pair<int, int> (4211, 2025) );
-	chMap.insert( std::pair<int, int> (4212, 2019) );
-	chMap.insert( std::pair<int, int> (4213, 2020) );
+	chMap.insert( std::pair<int, int> (4201, 2008) );
+	chMap.insert( std::pair<int, int> (4202, 2009) );
+	chMap.insert( std::pair<int, int> (4203, 2024) );
+	chMap.insert( std::pair<int, int> (4204, 2012) );
+	chMap.insert( std::pair<int, int> (4205, 2014) );
+	chMap.insert( std::pair<int, int> (4206, 2013) );
+	chMap.insert( std::pair<int, int> (4207, 2021) );
+	chMap.insert( std::pair<int, int> (4208, 2010) );
+	chMap.insert( std::pair<int, int> (4209, 2004) );
+	chMap.insert( std::pair<int, int> (4210, 2025) );
+	chMap.insert( std::pair<int, int> (4211, 2023) );
+	chMap.insert( std::pair<int, int> (4212, 2032) );
+	chMap.insert( std::pair<int, int> (4213, 2011) );
 	chMap.insert( std::pair<int, int> (4214, 2033) );
-	chMap.insert( std::pair<int, int> (4215, 20) );
-	chMap.insert( std::pair<int, int> (4216, 1001) );
-	chMap.insert( std::pair<int, int> (4217, 1001) );
-	chMap.insert( std::pair<int, int> (4218, 1001) );
-	chMap.insert( std::pair<int, int> (4219, 1001) );
-	chMap.insert( std::pair<int, int> (4220, 1001) );
-	chMap.insert( std::pair<int, int> (4221, 1001) );
-	chMap.insert( std::pair<int, int> (4222, 1001) );
-	chMap.insert( std::pair<int, int> (4223, 1001) );
-	chMap.insert( std::pair<int, int> (4224, 1001) );
-	chMap.insert( std::pair<int, int> (4225, 1001) );
-	chMap.insert( std::pair<int, int> (4226, 1001) );
-	chMap.insert( std::pair<int, int> (4227, 1001) );
-	chMap.insert( std::pair<int, int> (4228, 1001) );
-	chMap.insert( std::pair<int, int> (4229, 1001) );
-	chMap.insert( std::pair<int, int> (4230, 1001) );
-	chMap.insert( std::pair<int, int> (4231, 1001) );
-	chMap.insert( std::pair<int, int> (4232, 1001) );
+	chMap.insert( std::pair<int, int> (4215, 2020) );
+	chMap.insert( std::pair<int, int> (4216, 2019) );
+	chMap.insert( std::pair<int, int> (4217, 1008) );
+	chMap.insert( std::pair<int, int> (4218, 1009) );
+	chMap.insert( std::pair<int, int> (4219, 1024) );
+	chMap.insert( std::pair<int, int> (4220, 1012) );
+	chMap.insert( std::pair<int, int> (4221, 1014) );
+	chMap.insert( std::pair<int, int> (4222, 1013) );
+	chMap.insert( std::pair<int, int> (4223, 1021) );
+	chMap.insert( std::pair<int, int> (4224, 1010) );
+	chMap.insert( std::pair<int, int> (4225, 1004) );
+	chMap.insert( std::pair<int, int> (4226, 1025) );
+	chMap.insert( std::pair<int, int> (4227, 1023) );
+	chMap.insert( std::pair<int, int> (4228, 1032) );
+	chMap.insert( std::pair<int, int> (4229, 1011) );
+	chMap.insert( std::pair<int, int> (4230, 1033) );
+	chMap.insert( std::pair<int, int> (4231, 1020) );
+	chMap.insert( std::pair<int, int> (4232, 1019) );
 
+	return chMap;
 }
 
 /*
 map<str*, vector<int>> GetHodoChMap(void)
 {
 	std::map<int, int> chMap;
+
+	// L측 (모듈 ID 41)
+    {“L1”,  {41,  1}}, {“R1",  {41,  2}}, {“L6”,  {41,  3}}, {“R6",  {41,  4}},
+    {“R5”,  {41,  5}}, {“R26",  {41,  6}}, {“R30”,  {41,  7}}, {“R29",  {41,  8}},
+    {“R3”,  {41,  9}}, {“R18", {41, 10}}, {“R17”, {41, 11}}, {“R31", {41, 12}},
+    {“R2”, {41, 13}}, {“R27", {41, 14}}, {“R22”, {41, 15}},
+    {“R28", {41, 16}}, {“L7”, {41, 17}}, {“R7", {41, 18}}, {“L15”, {41, 19}},
+    {“R15", {41, 20}}, {“L5”, {41, 21}}, {“L26", {41, 22}}, {“L30”, {41, 23}},
+    {“L29", {41, 24}}, {“L3”, {41, 25}}, {“L18", {41, 26}}, {“L17”, {41, 27}},
+    {“L31", {41, 28}}, {“L2”, {41, 29}}, {“L27", {41, 30}}, {“L22”, {41, 31}},
+    {“L28", {41, 32}},
+    // R측 (모듈 ID 42)
+    {“R8”,  {42,  1}}, {“R9",  {42,  2}}, {“R24”,  {42,  3}}, {“12",  {42,  4}},
+    {“R14”,  {42,  5}}, {“R13",  {42,  6}}, {“R21”,  {42,  7}}, {“R10",  {42,  8}},
+    {“R4”,  {42,  9}}, {“R25", {42, 10}}, {“R23”, {42, 11}}, {“R32", {42, 12}},
+    {“R111”, {42, 13}}, {“R33", {42, 14}}, {“R20”, {42, 15}},
+    {“R19", {42, 16}}, {“L8”, {42, 17}}, {“L9", {42, 18}}, {“L24”, {42, 19}},
+    {“L12", {42, 20}}, {“L14”, {42, 21}}, {“L13", {42, 22}}, {“L21”, {42, 23}},
+    {“L10", {42, 24}}, {“L4”, {42, 25}}, {“L25", {42, 26}}, {“L23”, {42, 27}},
+    {“L32", {42, 28}}, {“L11”, {42, 29}}, {“L33", {42, 30}}, {“L20”, {42, 31}},
+    {“L19", {42, 32}}
+};
 
 */
 
@@ -685,10 +708,27 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 	}
 	cout <<Form("Start quick QA by directly decoding %s...\n", inFile);
 
+	//return;
+
 	// Cuts, Containers
 	//----------------------------------------------------------
 	const int nCh = 32;
-	std::map<int, int> chMap = GetHodoChMap();
+	std::map<int, int> chMapHodo = GetHodoChMap();
+	std::map<int, int> chMapCalo = GetCaloChMap();
+
+	for (int ii=0; ii<2; ii++){
+		for (int ich=0; ich<nCh; ich++){
+
+			int val = chMapCalo[(41+ii)*100 + ich+1];
+
+			if ( val/100==10 ){
+				cout << "mid: " << 41+ii << ", ch: " << ich+1 << ", L" << val%100 << endl;
+			}else if ( val/100==20 ){
+				cout << "mid: " << 41+ii << ", ch: " << ich+1 << ", R" << val%100 << endl;
+			}
+
+		}//
+	}//
 
 	int nHit[nCh] = {0};
 
@@ -901,7 +941,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 
 			if (validPulse)
 			{
-				const int ch = (mid==31) ? chMap[channel] : channel;
+				const int ch = (mid==31) ? chMapHodo[channel] : channel;
 				nHit[ch-1]++;
 				if ( mid==41 ){
 					c1->cd(16*1+ch);
