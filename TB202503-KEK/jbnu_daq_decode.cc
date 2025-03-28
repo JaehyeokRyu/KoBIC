@@ -266,7 +266,7 @@ int jbnu_daq_decode(const int RunNo, const char* inPath = "../data")
 			hEvtCount->Fill(tcb_trigger_number);
 
 		}else{
-			hEvtCount->Fill(local_trigger_number);
+			hEvtCount->Fill(tcb_trigger_number);
 		}
 
 
