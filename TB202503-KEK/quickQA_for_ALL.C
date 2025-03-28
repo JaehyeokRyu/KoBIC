@@ -14,7 +14,7 @@ using namespace std;
 #define bDEBUG false 
 
 //for drawing
-map<int, int> wform_factor = {{31, 100}, {41, 1500}, {42, 1500}};
+map<int, int> wform_factor = {{31, 150}, {41, 2000}, {42, 2000}};
 map<int, int> gate_width = {{31, 2}, {41, 2}, {42, 2}};
 map<int, int> cutPed = {{1, 50}, {2, 50}, {31, 20}, {41, 20}, {42, 20}};
 
@@ -25,9 +25,8 @@ TCanvas *ctmp;
 TCanvas *c1;
 TCanvas *c2;
 TCanvas *c3;
-TCanvas *c4[2];
-TCanvas *c5[2];
-TCanvas *c6[2];
+
+int GetDataLength(const char* inFile);
 
 //convert DAQ channel index to Geo channel index
 map<int, int> GetHodoChMap(void);
@@ -38,15 +37,14 @@ map<std::pair<int,int>, vector<int>> GetCaloChMap(void);
 //QA code for BIC DAQ
 void bic_daq_quickQA(int RunNo, int nEvtToRead, const char* inPath, int mid);
 
-TH2D *H2_pulse[2][32];
-TH1D *H1_peak[2][32];
-TH1D *H1_sum[2][32];
+//QA code for NKFADC500
+void nkfadc_daq_quickQA(int RunNo, int nEvtToRead, const char* inPath, int mid);
 
 std::map<std::pair<int,int>, vector<int>> chMapCalo;
 std::map<int, int> chMapHodo;
 void CreateCanvas(int RunNo, float xCVS);
 
-void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "./25KEKDATA"){
+void quickQA_for_ALL(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "./25KEKDATA"){
 
 	//gStyle->SetOptStat(0);
 	gStyle->SetTitleSize(0.04);
@@ -57,7 +55,7 @@ void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath
 	//1: NKFADC500, Gas chamber
 	//2: NKFADC500, Trigger
 	//3: JBNU DAQ,  
-	vector<int> mid = {42};
+	vector<int> mid = {1, 2, 31, 41, 42};
 
 	chMapCalo = GetCaloChMap();
 	chMapHodo = GetHodoChMap();
@@ -74,15 +72,17 @@ void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath
 	
 	CreateCanvas(RunNo, xCVS);
 
+	if ( find(mid.begin(), mid.end(), 1)!=mid.end() ){
+		nkfadc_daq_quickQA(RunNo, nEvtToRead, inPath, 1);
+	}
 
-	for (int ii=0; ii<2; ii++){
-		for (int ich=0; ich<32; ich++){
-			H2_pulse[ii][ich] = new TH2D(Form("H2_pulse_mid%d_ch%d",41+ii,1+ich),"",120,0,120,6000,-100,12000);
+	if ( find(mid.begin(), mid.end(), 2)!=mid.end() ){
+		nkfadc_daq_quickQA(RunNo, nEvtToRead, inPath, 2);
+	}
 
-			H1_peak[ii][ich] = new TH1D(Form("H1_peak_mid%d_ch%d", 41+ii,1+ich),"",10000,-100,15000);
-			H1_sum[ii][ich] = new TH1D(Form("H1_sum_mid%d_ch%d", 41+ii,1+ich),"",10000,-100,15000*10);
-		}//ich
-	}//ii
+	if ( find(mid.begin(), mid.end(), 31)!=mid.end() ){
+		bic_daq_quickQA(RunNo, nEvtToRead, inPath, 31);
+	}
 
 	if ( find(mid.begin(), mid.end(), 42)!=mid.end() ){
 		bic_daq_quickQA(RunNo, nEvtToRead, inPath, 42);
@@ -91,48 +91,6 @@ void quickQA_for_HV(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath
 	if ( find(mid.begin(), mid.end(), 41)!=mid.end() ){
 		bic_daq_quickQA(RunNo, nEvtToRead, inPath, 41);
 	}
-
-	//Draw histograms for Calo Equalization
-	for (int ii=0; ii<2; ii++){
-		for (int ich=0; ich<32; ich++){
-
-			if ( ii==0 && (ich<4) ) continue;
-
-			vector a = chMapCalo[std::make_pair(41+ii, ich+1)];
-			int lrid = a[0];
-			int modid = a[1];
-			int colid = a[2]; 
-			int rowid = a[3];
-
-			TLegend *leg = new TLegend(0.15, 0.90, 0.50, 0.95);
-			leg->SetBorderSize(0);
-			leg->AddEntry("",Form("MID %02d, CH %02d, MODID %02d", 41+ii, ich+1, modid),"h");
-			leg->SetTextSize(0.06);
-
-			c4[lrid]->cd( colid + 1 + 8*(3 - rowid));
-			H2_pulse[ii][ich]->Draw("colz same");
-			leg->Draw();
-
-			c5[lrid]->cd( colid + 1 + 8*(3 - rowid));
-			H1_peak[ii][ich]->SetName(Form("MID %02d, CH %02d, MODID %02d", 41+ii, ich+1, modid));
-			H1_peak[ii][ich]->Draw("same");
-
-			c6[lrid]->cd( colid + 1 + 8*(3 - rowid));
-			H1_sum[ii][ich]->SetName(Form("MID %02d, CH %02d, MODID %02d", 41+ii, ich+1, modid));
-			H1_sum[ii][ich]->Draw("same");
-
-		}//ich
-	}//ii
-
-	/*
-	TFile *outfile = new TFile(Form("outfile_Run%d.root", RunNo), "recreate");
-	for (int ii=0; ii<2; ii++){
-		for (int ich=0; ich<32; ich++){
-			H1_sum[ii][ich]->Write();
-		}
-	}
-	outfile->Close();
-	*/
 
 	return;
 }
@@ -256,7 +214,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		*/
 
 		if ( channel>nCh ){
-			cout << "WARNNING! suspicious channel number! MID: " << mid << ", CH:" << channel << endl; 
+			cout << "BICDAQ WARNNING! suspicious channel number! MID: " << mid << ", CH:" << channel << endl; 
 			fread(data, 1, data_length_exp - 32, fp);
 			nPacketProcessed++;
 			if ((nPacketProcessed/(nCh+1)) == nEvtToRead) break;
@@ -275,7 +233,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		}
 
 		if ( fabs(tcb_trigger_number-trigN)>10000 ){
-			cout << "WARNNING! suspicious tcb trigger number! MID: " << mid <<", TCB TrigN: " << tcb_trigger_number << " " << trigN 
+			cout << "BICDAQ WARNNING! suspicious tcb trigger number! MID: " << mid <<", TCB TrigN: " << tcb_trigger_number << " " << trigN 
 				<< ", CH: " << channel << endl;
 			if ( channel==0 ){
 				fread(data, 1, 256 - 32, fp);
@@ -297,7 +255,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 			}else{
 				fread(data, 1, data_length_exp - 32, fp);
 			}
-			cout << "WARNNING! suspicious data length! MID: " << mid << ", DLength: " << data_length << ", CH: " << channel << endl;
+			cout << "BICDAQ WARNNING! suspicious data length! MID: " << mid << ", DLength: " << data_length << ", CH: " << channel << endl;
 			nPacketProcessed++;
 			if ((nPacketProcessed/(nCh+1)) == nEvtToRead) break;
 			continue;
@@ -308,7 +266,7 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 				trigN = tcb_trigger_number;
 				trigT = tcb_trigger_time;
 			}else{
-				cout << "WARNNING! different trigger number but same trigger time!" << endl;
+				cout << "BICDAQ WARNNING! different trigger number but same trigger time!" << endl;
 			}
 		}
 
@@ -362,13 +320,8 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 
 					if (fabs(adc[a]) > cutPed[mid]) validPulse = true;
 					H1_pulse->SetBinContent(a+1, adc[a]);
-					H2_pulse[mid-41][channel-1]->Fill(a, adc[a]);
 				}
 			}
-
-			H1_sum[mid-41][channel-1]->Fill(H1_pulse->Integral(51,100));
-			H1_pulse->GetXaxis()->SetRange(51,100);
-			H1_peak[mid-41][channel-1]->Fill(H1_pulse->GetMaximum());
 
 			if (validPulse)
 			{
@@ -392,31 +345,33 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		if (nPacketProcessed%10000 == 0) cout << "Processed eventNum = " << nPacketProcessed/(nCh+1) << endl;
 		if ((nPacketProcessed/(nCh+1)) == nEvtToRead) break;
 
-	}
-
+	}//while
 	fclose(fp);
 
 	//Draw
 	TH1D *H1_rate = new TH1D("", "", nCh, 0, nCh);
-	for (int a=0; a<nCh; a++){
-		if ( mid==41 ){
-			c1->cd(16*1+a+1);
-		}else if ( mid==42 ){
-			c1->cd(16*3+a+1);
-		}else if ( mid==31 ){
-			c1->cd(16*5+a+1);
+	if ( c1 ){
+		for (int a=0; a<nCh; a++){
+			if ( mid==41 ){
+				c1->cd(16*1+a+1);
+			}else if ( mid==42 ){
+				c1->cd(16*3+a+1);
+			}else if ( mid==31 ){
+				c1->cd(16*5+a+1);
+			}
+
+			TLegend *leg = new TLegend(0.2, 0.95-0.1*3, 0.5, 0.95);
+			leg->SetFillStyle(0);
+			leg->SetBorderSize(0);
+			leg->SetTextFont(43);
+			leg->SetTextSize(8);
+			leg->AddEntry("",Form("MID %d, CH %d", mid, a+1),"h"); 
+			leg->AddEntry("",Form("Hit rate %d / %d",nHit[a],(trigN+1)),"h");
+			leg->AddEntry("",Form("Hit rate = %1.2f",nHit[a]*1.0/(trigN+1)),"h");
+
+			H1_rate->SetBinContent(a+1, nHit[a]*1.0/trigN);
+			leg->Draw();
 		}
-
-		TLegend *leg = new TLegend(0.2, 0.95-0.1*2, 0.5, 0.95);
-		leg->SetFillStyle(0);
-		leg->SetBorderSize(0);
-		leg->SetTextFont(43);
-		leg->SetTextSize(8);
-		leg->AddEntry("",Form("MID %d, CH %d", mid, a+1),"h"); 
-		leg->AddEntry("",Form("Hit rate %d / %d = %1.2f",nHit[a],(trigN+1),nHit[a]*1.0/(trigN+1)),"h");
-
-		H1_rate->SetBinContent(a+1, nHit[a]*1.0/trigN);
-		leg->Draw();
 	}
 
 	TH1D *H2_projx = (TH1D*)H2->ProjectionX("H2_projx");
@@ -425,69 +380,71 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		H2_projx->Draw();
 	}
 
-	if ( mid==41 ){
-		c2->cd(3);
-	}else if ( mid==42 ){
-		c2->cd(4);
-	}else{
-		c2->cd(5);
-	}
-	gPad->SetMargin(0.15,0.12,0.12,0.05);
-	gPad->SetTicks();
-	H2->GetXaxis()->SetRangeUser(0, trigN);
-	H2->GetXaxis()->SetTitleSize(0.05);
-	H2->GetXaxis()->SetLabelSize(0.045);
-	H2->GetYaxis()->SetTitleSize(0.05);
-	H2->GetYaxis()->SetLabelSize(0.045);
-	H2->GetZaxis()->SetTitleSize(0.05);
-	H2->GetZaxis()->SetLabelSize(0.045);
-	H2->GetZaxis()->SetRangeUser(0, 1.5*nCh);
-	TH2F *H2_cp = (TH2F*)H2->DrawCopy("colz");
-	H2_cp->SetStats(0);
-
-	int trigN_GOOD = 0;
-	for (int ii=0; ii<trigN*0.9; ii++){
-		if ( H2_projx->GetBinContent(ii+1)==(nCh+1) ){
-			trigN_GOOD++;
+	if ( c2 ){
+		if ( mid==41 ){
+			c2->cd(3);
+		}else if ( mid==42 ){
+			c2->cd(4);
+		}else{
+			c2->cd(5);
 		}
+		gPad->SetMargin(0.15,0.12,0.12,0.05);
+		gPad->SetTicks();
+		H2->GetXaxis()->SetRangeUser(0, trigN);
+		H2->GetXaxis()->SetTitleSize(0.05);
+		H2->GetXaxis()->SetLabelSize(0.045);
+		H2->GetYaxis()->SetTitleSize(0.05);
+		H2->GetYaxis()->SetLabelSize(0.045);
+		H2->GetZaxis()->SetTitleSize(0.05);
+		H2->GetZaxis()->SetLabelSize(0.045);
+		H2->GetZaxis()->SetRangeUser(0, 1.5*nCh);
+		TH2F *H2_cp = (TH2F*)H2->DrawCopy("colz");
+		H2_cp->SetStats(0);
+
+		int trigN_GOOD = 0;
+		for (int ii=0; ii<trigN*0.9; ii++){
+			if ( H2_projx->GetBinContent(ii+1)==(nCh+1) ){
+				trigN_GOOD++;
+			}
+		}
+
+		TLegend *leg = new TLegend(0.15, 0.93-0.06*3, 0.5, 0.93);
+		leg->SetFillStyle(0);
+		leg->SetBorderSize(0);
+		leg->SetTextFont(43);
+		leg->SetTextSize(12);
+		leg->AddEntry("",Form("RUN %d, MID %d", RunNo, mid),"h");
+		leg->AddEntry("",Form("Good events %d / %d = %4.1f%%",trigN_GOOD,int(trigN*0.9+1),trigN_GOOD*100/(trigN*0.9+1)),"h");
+		if ( trigN_GOOD/(trigN*0.9+1)<0.9 ){
+			leg->AddEntry("","Bad RUN!","h");
+		}else{
+			leg->AddEntry("","Good RUN!","h");
+		}
+		leg->Draw();
+
+		if ( mid==41 ){
+			c2->cd(7+3);
+		}else if ( mid==42 ){
+			c2->cd(7+4);
+		}else{
+			c2->cd(7+5);
+		}
+		gPad->SetTicks();
+		gPad->SetMargin(0.14,0.01,0.12,0.12);
+		H1_rate->GetYaxis()->SetRangeUser(0, 1.5*H1_rate->GetMaximum());
+		H1_rate->GetXaxis()->SetTitle("CH Index");
+		H1_rate->GetXaxis()->SetTitleSize(0.05);
+		H1_rate->GetXaxis()->SetLabelSize(0.045);
+		H1_rate->GetYaxis()->SetTitle("HIT Rate");
+		H1_rate->GetYaxis()->SetTitleSize(0.05);
+		H1_rate->GetYaxis()->SetLabelSize(0.045);
+		H1_rate->GetZaxis()->SetTitleSize(0.05);
+		H1_rate->GetZaxis()->SetLabelSize(0.045);
+		TH1F *H1_rate_cp = (TH1F*)H1_rate->DrawCopy("HIST");
+		H1_rate_cp->SetStats(0);
 	}
 
-	TLegend *leg = new TLegend(0.15, 0.90-0.06*3, 0.5, 0.90);
-	leg->SetFillStyle(0);
-	leg->SetBorderSize(0);
-	leg->SetTextFont(43);
-	leg->SetTextSize(12);
-	leg->AddEntry("",Form("RUN %d, MID%d", RunNo, mid),"h");
-	leg->AddEntry("",Form("Good events %d / %d = %4.1f%%",trigN_GOOD,int(trigN*0.9+1),trigN_GOOD*100/(trigN*0.9+1)),"h");
-	if ( trigN_GOOD/(trigN*0.9+1)<0.9 ){
-		leg->AddEntry("","Bad RUN!","h");
-	}else{
-		leg->AddEntry("","Good RUN!","h");
-	}
-	leg->Draw();
-
-	if ( mid==41 ){
-		c2->cd(7+3);
-	}else if ( mid==42 ){
-		c2->cd(7+4);
-	}else{
-		c2->cd(7+5);
-	}
-	gPad->SetTicks();
-	gPad->SetMargin(0.14,0.01,0.12,0.12);
-	H1_rate->GetYaxis()->SetRangeUser(0, 1.5*H1_rate->GetMaximum());
-	H1_rate->GetXaxis()->SetTitle("CH Index");
-	H1_rate->GetXaxis()->SetTitleSize(0.05);
-	H1_rate->GetXaxis()->SetLabelSize(0.045);
-	H1_rate->GetYaxis()->SetTitle("HIT Rate");
-	H1_rate->GetYaxis()->SetTitleSize(0.05);
-	H1_rate->GetYaxis()->SetLabelSize(0.045);
-	H1_rate->GetZaxis()->SetTitleSize(0.05);
-	H1_rate->GetZaxis()->SetLabelSize(0.045);
-	TH1F *H1_rate_cp = (TH1F*)H1_rate->DrawCopy("HIST");
-	H1_rate_cp->SetStats(0);
-
-	if ( 1 ){
+	if ( c3 ){
 		if ( mid==41 ){
 			c3->cd(3);
 		}else if ( mid==42 ){
@@ -503,6 +460,357 @@ void bic_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPat
 		H1Packet->GetXaxis()->SetLabelSize(0.05);
 		H1Packet->GetXaxis()->SetRangeUser(0, nPacketProcessed);
 		H1Packet->GetYaxis()->SetTitle("Trigger Index*100 + Channel Index");
+		H1Packet->GetYaxis()->SetTitleSize(0.055);
+		H1Packet->GetYaxis()->SetTitleOffset(0.9);
+		H1Packet->GetYaxis()->SetLabelSize(0.05);
+		H1Packet->SetStats(0);
+		H1Packet->Draw();
+
+		TLegend *leg = new TLegend(0.2, 0.95-0.08*1, 0.5, 0.95);
+		leg->SetFillStyle(0);
+		leg->SetBorderSize(0);
+		leg->SetTextFont(43);
+		leg->SetTextSize(16);
+		leg->AddEntry("",Form("RUN %d, MID %d", RunNo, mid),"h"); 
+		leg->Draw();
+	}
+
+}
+
+//--------------------------------------------------------------------------------------------------------
+void nkfadc_daq_quickQA(int RunNo = 2080, int nEvtToRead = 10000, const char* inPath = "data_hodoscope_raw", int mid = 1)
+{
+
+	//const char* inFile = Form("%s/FADCData_%d_%i.dat", inPath, mid, RunNo);
+	const char* inFile = Form("%s/Run_%d/Run_%d_MID_%d/FADCData_%d_%i.dat", inPath, RunNo, RunNo, mid, mid, RunNo);
+	cout <<Form("Start quick QA by directly decoding %s...\n", inFile);
+
+	const int nCh  = 4;
+	const int OffsetADC = 3170;
+	const bool FlipADC = false; //If true flip the ADC to '4095 - ADC'
+
+	int nHit[nCh] = {0};
+
+	int DLen = GetDataLength(inFile); //header (32) + body (vary), per ch
+	//if (DLen > 16384) { cout <<"WARNING! Irregular data length detected: stop.\n"; return; }
+	if (DLen > 16384) { 
+		cout << "WARNING! Irregular data length detected: " << DLen << endl; 
+		cout << "WARNING! Use the default value!!" << endl; 
+		if ( mid==1 ){
+			DLen = 2048;
+		}else{
+			DLen = 128;
+		}
+	}
+	const int TLen = DLen * nCh; //Total length
+	const int nADC = (DLen - 32)/2; //# of ADC samples per event
+	const int nTDC = nADC/4;
+
+	UInt_t  fADC[nCh][nADC]; //ADC
+	UInt_t  fTDC[nCh][nTDC]; //TDC
+
+	cout << "NKFADC500 Total length: " << TLen << ", nADC: " << nADC << ", nTDC: " << nTDC << endl;
+
+	//Read binary and Convert it to ROOT
+	//-------------------------------------------
+
+	TH1F* H1_pulse = new TH1F(Form("H1_pulse_%d",mid), "", 1024, 0, 1024);
+
+	int trigN = -1;
+	unsigned long long trigT = -1;
+
+	TH2F* H2 = new TH2F(Form("trig_nVSt_%d",mid), Form(";Trigger Number; Trigger Time"), 10000,0,10000, 200,0,0.5*1.E10);
+	TH1F *H1Packet = new TH1F(Form("PacketQA_%d",mid), "", nPacketCheck, 0, nPacketCheck);
+
+	ifstream in;
+	int nPacketProcessed=0;
+	char data[TLen];
+	char dataChop[nCh][DLen];
+	in.open(inFile, std::ios::binary);
+	if (!in.is_open()) { cout <<"Cannot open the file! Stop.\n"; return; }
+
+	unsigned long nLine = 0;
+	while (in.peek() != EOF)
+	{
+		in.read(data, TLen);
+		if (!in.good())	{ cout <<"Data file is currupted! Stop.\n"; break; }
+
+		for (int j=0; j<nCh; j++)
+		{
+			for (int k=0; k<DLen; k++) dataChop[j][k] = data[j + 4*k];
+
+				/*
+				+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				Header
+				Byte: (item #) Contents
+
+				  0-3:  (1) Data length: total data length in bytes including header & body,
+				  4-5:  (2) Run number: run number received from TCB
+				    6:  (3) Trigger type: trigger type received from TCB
+			     7-10:  (4) Trigger number: trigger number received from TCB
+				   11:  (5) Trigger fine time: trigger time received from TCB, 0~124, 8 ns per unit
+			    12-14:  (6) Trigger coarse time: trigger time received from TCB, 0~16,777,215 (us), 1 us per unit
+			       15:  (7) ADC module ID
+				   16:  (8) ADC channel number
+			    17-20:  (9) Local trigger number
+			    21-22: (10) Local trigger pattern
+			    23-24: (11) ADC pedestal
+			       25: (12) Data starting fine time, unit is 8 ns
+			    26-31: (13) Data starting coarse time. unit is us
+
+				* 8 bits per bytes: e.g., 0-3 means [7:0], [15:8], [23:16], and [31:24]
+				+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				*/
+
+				ULong_t tDataLen = 0;
+				for (int a=0; a<4; a++) tDataLen += ((ULong_t)(dataChop[j][a] & 0xFF) << 8*a);
+
+				UInt_t tTrigType = dataChop[j][6] & 0x0F;
+
+				ULong_t tTrigNum = 0;
+				for (int a=0; a<4; a++) tTrigNum += ((ULong_t)(dataChop[j][7+a] & 0xFF) << 8*a);
+
+				int tTrigFineTime = (int)(dataChop[j][11] & 0xFF);
+				int tTrigCoarseTime = 0;
+				for (int a=0; a<3; a++) tTrigCoarseTime += ((int)(dataChop[j][a+12] & 0xFF) << 8*a);
+				unsigned long long tTrigTime = (tTrigFineTime * 8) + (tTrigCoarseTime * 1000); 
+
+					/*
+				unsigned long long tTrigTime = ( (int)(dataChop[j][11] & 0xFF)        ) * 8    + //Fine time: 8 ns/unit
+					                ( (int)(dataChop[j][12] & 0xFF)        ) * 1000 + //Coarse time: 1 us/unit
+									( (ULong_t)(dataChop[j][13] & 0xFF) << 8   ) * 1000 +
+									( (ULong_t)(dataChop[j][14] & 0xFF) << 8*2 ) * 1000;
+									*/
+
+				UInt_t tModuleID = dataChop[j][15] & 0xFF;
+				UInt_t tChannel  = dataChop[j][16] & 0xFF;
+				if (tChannel<1 || tChannel>4){
+					cout <<Form("NKFADC500 WARNING: irregular ch ID found: %i\n", tChannel);
+					nPacketProcessed++;
+					if ((nPacketProcessed/(nCh)) == nEvtToRead) break;
+					continue;
+				}
+
+				if (tTrigType!=3){
+					cout <<Form("NKFADC500 WARNING: irregular trigger type: %i\n", tTrigType);
+					nPacketProcessed++;
+					if ((nPacketProcessed/(nCh)) == nEvtToRead) break;
+					continue;
+				}
+
+				ULong_t tLocTNum = 0;
+				for (int a=0; a<4; a++) tLocTNum += ( (ULong_t)(dataChop[j][17+a] & 0xFF) << 8*a );
+
+				UInt_t tLocTPat = 0;
+				for (int a=0; a<2; a++) tLocTPat += ( (dataChop[j][21+a] & 0xFF) << 8*a );
+
+				UInt_t tPed = 0;
+				for (int a=0; a<2; a++) tPed += ( (dataChop[j][23+a] & 0xFF) << 8*a );
+
+				//unsigned int: 16 bit, unsigned long: 32 bit, unsigned long long = 64 bit
+				unsigned long long tDatTime = ( (unsigned long long)(dataChop[j][25] & 0xFF)        ) * 8    +
+					                          ( (unsigned long long)(dataChop[j][26] & 0xFF)        ) * 1000 +
+											  ( (unsigned long long)(dataChop[j][27] & 0xFF) << 8   ) * 1000 +
+											  ( (unsigned long long)(dataChop[j][28] & 0xFF) << 8*2 ) * 1000 +
+											  ( (unsigned long long)(dataChop[j][29] & 0xFF) << 8*3 ) * 1000 +
+											  ( (unsigned long long)(dataChop[j][30] & 0xFF) << 8*4 ) * 1000 +
+											  ( (unsigned long long)(dataChop[j][31] & 0xFF) << 8*5 ) * 1000;
+
+				if ( bDEBUG ){
+					cout <<Form("%i %i %i %i | %4li %4i | %i %5li %5li %i | %lli %lli \n",
+							mid,tModuleID,j+1,tChannel, 
+							tDataLen,tPed,
+							tTrigType,tTrigNum,tLocTNum,tLocTPat, 
+							tTrigTime,tDatTime);
+				}
+
+				if ( nPacketProcessed<H1Packet->GetNbinsX() ){
+					H1Packet->SetBinContent(nPacketProcessed+1, 10*tTrigNum + tChannel); 
+				}
+
+				if ( trigN!=tTrigNum ){
+					if ( trigT!=tTrigTime ){
+						trigN = tTrigNum;
+						trigT = tTrigTime;
+					}else{
+						cout << "NKFADC500 WARNNING! different trigger number but same trigger time!" << endl;
+					}
+				}
+
+				H2->Fill(tTrigNum, tTrigTime);
+
+				/*
+				++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				Body
+				Byte: [Bits], Contents
+
+				0: [7~0], ADC data[0][ 7:0]
+				1: [3~0], ADC data[0][11:8]
+				1: [7~4], TDC data[0][ 3:0]
+				2: [7~0], ADC data[1][ 7:0]
+				3: [3~0], ADC data[1][11:8]
+				3: [7~4], TDC data[0][ 7:4]
+				4: [7~0], ADC data[2][ 7:0]
+				5: [3~0], ADC data[2][11:8]
+				5: [7~4], TDC data[0][11:8]
+				6: [7~0], ADC data[3][ 7:0]
+				7: [3~0], ADC data[3][11:8]
+				7: [7~4], 0 (empty)
+				---------------------------
+				8: [7~0], ADC data[0][ 7:0]
+				...
+
+				* 4 ADC samples and 1 TDC sample per 8 bytes, then repeat for 'N = (data_length - 32)/2'
+				* 8 ps per TDC channel
+				++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				*/
+
+				H1_pulse->Reset();
+				bool validPulse = false;
+				for (int a=0; a<nADC; a++)
+				{
+					const int iSmp = 32 + 2*a;
+					UInt_t tADC = (dataChop[j][iSmp] & 0xFF) + ((dataChop[j][iSmp + 1] & 0xF) << 8);
+
+					//if (j==0 || j==2) fADC[j][a] = (4095 - tADC); //TEMPORARY! Aug. 23, 2022
+					//if (FlipADC == true) fADC[j][a] = (4095 - tADC);
+					//else fADC[j][a] = tADC;
+
+					fADC[j][a] = tADC;
+
+					if (fabs(fADC[j][a]-OffsetADC)>cutPed[mid]) validPulse = true;
+
+					H1_pulse->SetBinContent(a+1, fADC[j][a]);
+				}
+
+				/*
+				for (int a=0; a<nTDC; a++)
+				{
+					const int iSmp = 32 + 8*a;
+					UInt_t tTDC = ((dataChop[j][iSmp + 1] & 0xF0) >> 4) + 
+						          ((dataChop[j][iSmp + 3] & 0xF0)) +
+						          ((dataChop[j][iSmp + 5] & 0xF0) << 4);
+
+					fTDC[j][a] = tTDC;
+				}
+				*/
+
+				if (validPulse)
+				{
+					nHit[tChannel-1]++;
+					c1->cd(nCh*(mid-1)+tChannel);
+					H1_pulse->DrawCopy("same");
+				}
+
+				nPacketProcessed++;
+				if (nPacketProcessed%10000 == 0) cout << "Processed eventNum = " << nPacketProcessed/(nCh) << endl;
+
+		}//j
+
+		if ((nPacketProcessed/(nCh)) >= nEvtToRead) break;
+
+	}//while
+	in.close();
+
+	//Draw
+	TH1D *H1_rate = new TH1D("", "", nCh, 0, nCh);
+	if ( c1 ){
+		for (int a=0; a<nCh; a++){
+			c1->cd(nCh*(mid-1)+a+1);
+
+			TLegend *leg = new TLegend(0.2, 0.95-0.1*3, 0.5, 0.95);
+			leg->SetFillStyle(0);
+			leg->SetBorderSize(0);
+			leg->SetTextFont(43);
+			leg->SetTextSize(8);
+			leg->AddEntry("",Form("MID %d, CH %d", mid, a+1),"h"); 
+			leg->AddEntry("",Form("Hit rate %d / %d",nHit[a],(trigN+1)),"h");
+			leg->AddEntry("",Form("Hit rate = %1.2f",nHit[a]*1.0/(trigN+1)),"h");
+
+			H1_rate->SetBinContent(a+1, nHit[a]*1.0/trigN);
+			leg->Draw();
+		}
+	}
+
+	TH1D *H2_projx = (TH1D*)H2->ProjectionX("H2_projx");
+	if ( bDEBUG ){
+		ctmp->cd();
+		H2_projx->Draw();
+	}
+
+	if ( c2 ){
+		if ( mid==1 ){
+			c2->cd(1);
+		}else{
+			c2->cd(2);
+		}
+		gPad->SetMargin(0.15,0.12,0.12,0.05);
+		gPad->SetTicks();
+		H2->GetXaxis()->SetRangeUser(0, trigN);
+		H2->GetXaxis()->SetTitleSize(0.05);
+		H2->GetXaxis()->SetLabelSize(0.045);
+		H2->GetYaxis()->SetTitleSize(0.05);
+		H2->GetYaxis()->SetLabelSize(0.045);
+		H2->GetZaxis()->SetTitleSize(0.05);
+		H2->GetZaxis()->SetLabelSize(0.045);
+		H2->GetZaxis()->SetRangeUser(0, 1.5*nCh);
+		TH2F *H2_cp = (TH2F*)H2->DrawCopy("colz");
+		H2_cp->SetStats(0);
+
+		int trigN_GOOD = 0;
+		for (int ii=0; ii<trigN*0.9; ii++){
+			if ( H2_projx->GetBinContent(ii+1)==(nCh) ){
+				trigN_GOOD++;
+			}
+		}
+
+		TLegend *leg = new TLegend(0.15, 0.85-0.06*3, 0.5, 0.85);
+		leg->SetFillStyle(0);
+		leg->SetBorderSize(0);
+		leg->SetTextFont(43);
+		leg->SetTextSize(12);
+		leg->AddEntry("",Form("RUN %d, MID%d", RunNo, mid),"h");
+		leg->AddEntry("",Form("Good Evts %d / %d = %4.1f%%",trigN_GOOD,int(trigN*0.9+1),trigN_GOOD*100/(trigN*0.9+1)),"h");
+		if ( trigN_GOOD/(trigN*0.9+1)<0.9 ){
+			leg->AddEntry("","Bad RUN!","h");
+		}else{
+			leg->AddEntry("","Good RUN!","h");
+		}
+		leg->Draw();
+
+		if ( mid==1 ){
+			c2->cd(7+1);
+		}else{
+			c2->cd(7+2);
+		}
+		gPad->SetTicks();
+		gPad->SetMargin(0.14,0.01,0.12,0.12);
+		H1_rate->GetYaxis()->SetRangeUser(0, 1.5*H1_rate->GetMaximum());
+		H1_rate->GetXaxis()->SetTitle("CH Index");
+		H1_rate->GetXaxis()->SetTitleSize(0.05);
+		H1_rate->GetXaxis()->SetLabelSize(0.045);
+		H1_rate->GetYaxis()->SetTitle("HIT Rate");
+		H1_rate->GetYaxis()->SetTitleSize(0.05);
+		H1_rate->GetYaxis()->SetLabelSize(0.045);
+		H1_rate->GetZaxis()->SetTitleSize(0.05);
+		H1_rate->GetZaxis()->SetLabelSize(0.045);
+		TH1F *H1_rate_cp = (TH1F*)H1_rate->DrawCopy("HIST");
+		H1_rate_cp->SetStats(0);
+	}
+
+	if ( c3 ){
+		if ( mid==1 ){
+			c3->cd(1);
+		}else{
+			c3->cd(2);
+		}
+		gPad->SetMargin(0.10,0.03,0.12,0.05);
+		gPad->SetTicks();
+		H1Packet->GetXaxis()->SetTitle("Packet Index");
+		H1Packet->GetXaxis()->SetTitleSize(0.055);
+		H1Packet->GetXaxis()->SetLabelSize(0.05);
+		H1Packet->GetXaxis()->SetRangeUser(0, nPacketProcessed);
+		H1Packet->GetYaxis()->SetTitle("Trigger Index*10 + Channel Index");
 		H1Packet->GetYaxis()->SetTitleSize(0.055);
 		H1Packet->GetYaxis()->SetTitleOffset(0.9);
 		H1Packet->GetYaxis()->SetLabelSize(0.05);
@@ -551,7 +859,17 @@ void CreateCanvas(int RunNo=1001, float xCVS=1.0){
 			}else if ( ii==5 || ii==6 ){
 				H1Temp->GetYaxis()->SetRangeUser(-1*wform_factor[31], 10*wform_factor[31]);
 			}else{
-				H1Temp->GetYaxis()->SetRangeUser(0, 4096);
+				H1Temp->GetYaxis()->SetRangeUser(0, 6000);
+			}
+
+			if ( ii==0 ){
+				if ( jj<4 ){
+					H1Temp->GetXaxis()->SetRangeUser(0, 1008);
+				}else if ( jj<8 ){
+					H1Temp->GetXaxis()->SetRangeUser(0, 48);
+				}
+			}else{
+				H1Temp->GetXaxis()->SetRangeUser(0, 124);
 			}
 			gPad->SetTicks();
 			gPad->SetMargin(0.15,0.05,0.1,0.01);
@@ -566,55 +884,9 @@ void CreateCanvas(int RunNo=1001, float xCVS=1.0){
 	gPad->SetMargin(0,0,0,0);
 	c2->Divide(7,2,0,0);
 
-	c3 = new TCanvas("c3", Form("RUN %d, Packet QA", RunNo), -1, 0, 200*2*2*xCVS, 200*5*xCVS);
+	c3 = new TCanvas("c3", Form("RUN %d, Packet QA", RunNo), -1, 0, 200*2*2*xCVS, 200*4*xCVS);
 	gPad->SetMargin(0,0,0,0);
-	c3->Divide(2,5,0,0);
-
-	H1Temp->GetYaxis()->SetRangeUser(-1*wform_factor[41], 10*wform_factor[41]);
-
-	for (int ii=0; ii<2; ii++){
-		string str = (ii==0) ? "LEFT" : "RIGHT";
-		c4[ii] = new TCanvas(Form("c4_%d",ii), Form("RUN %d, WAVEFORM, %s", RunNo, str.c_str()), -1, 0, 200*8, 200*4);
-		c4[ii]->SetMargin(0,0,0,0);
-		c4[ii]->Divide(8,4,0,0);
-
-		c5[ii] = new TCanvas(Form("c5_%d",ii), Form("RUN %d, PEAK ADC, %s", RunNo, str.c_str()), -1, 0, 200*8, 200*4);
-		c5[ii]->SetMargin(0,0,0,0);
-		c5[ii]->Divide(8,4,0,0);
-
-		c6[ii] = new TCanvas(Form("c6_%d",ii), Form("RUN %d, INT ADC, %s", RunNo, str.c_str()), -1, 0, 200*8, 200*4);
-		c6[ii]->SetMargin(0,0,0,0);
-		c6[ii]->Divide(8,4,0,0);
-
-		for (int jj=0; jj<32; jj++){
-
-			c4[ii]->cd(jj+1);
-			gPad->SetTicks();
-			gPad->SetMargin(0.15,0.1,0.1,0.01);
-			gPad->SetLogz();
-			TH1F *htmp = (TH1F*)H1Temp->DrawCopy();
-			htmp->SetStats(0);
-
-			c5[ii]->cd(jj+1);
-			gPad->SetTicks();
-			gPad->SetMargin(0.15,0.05,0.1,0.01);
-
-			c6[ii]->cd(jj+1);
-			gPad->SetTicks();
-			gPad->SetMargin(0.15,0.1,0.1,0.01);
-			gPad->SetLogz();
-		}
-
-		c4[ii]->cd();
-		c4[ii]->Update();
-
-		c5[ii]->cd();
-		c5[ii]->Update();
-
-		c6[ii]->cd();
-		c6[ii]->Update();
-	}//ii
-
+	c3->Divide(2,4,0,0);
 
 }
 
